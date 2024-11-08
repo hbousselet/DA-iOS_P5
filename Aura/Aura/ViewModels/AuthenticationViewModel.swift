@@ -22,7 +22,6 @@ class AuthenticationViewModel: ObservableObject {
     func login() {
         ApiService.shared.httpCall(httpMethod: "POST", route: .auth, parameters: (username, password)) { isWithoutError, data in
             guard let data, isWithoutError == true else { return }
-            
             guard let responseJson = try? JSONDecoder().decode(Authentication.self, from: data) else {
                 print("not able to convert")
                 return }
