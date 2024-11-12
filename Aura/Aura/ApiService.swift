@@ -12,15 +12,27 @@ class ApiService {
     let apiURL = "http://127.0.0.1:8080/"
     
     static var shared = ApiService()
+    static var token: String? = nil
+    static var allAccountTransactions: [AccountInfo.Transaction] = []
     
     private init() {
     }
     
-    func httpCall(httpMethod: String,
-                   token: String? = nil,
-                   route: Route,
-                   parameters: (String,String)? = nil,
-                   callback: @escaping ((Bool, Data?) -> Void)) {
+    //create session as a class variable and render it private not public
+    private var auraSession = URLSession(configuration: .default)
+    
+    //init ApiService in order to be able to fake it
+    init(session: URLSession) {
+        self.auraSession = session
+    }
+    
+    
+    func request<T: Decodable>(httpMethod: String,
+                  token: String? = token,
+                  route: Route,
+                  responseType: T.Type,
+                  parameters: [String:String]? = nil,
+                  callback: @escaping ((Bool, T?) -> Void)) {
         
         guard let url = URL(string: apiURL + route.rawValue) else {
             print("invalid URL")
@@ -31,21 +43,41 @@ class ApiService {
         request.setValue(token, forHTTPHeaderField: "token")
         
         if let parameters = parameters {
-            let body = "username=\(parameters.0)&password=\(parameters.1)"
+            let body = createBody(parameters)
             request.httpBody = body.data(using: .utf8)
         }
         
-        let session = URLSession(configuration: .default)
         task?.cancel()
         
-        task = session.dataTask(with: request) { data, response, error in
+        task = auraSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 guard let data, error == nil else { return callback(false, nil) }
-                guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { return }
-                callback(true, data)
+                guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { return callback(false, nil) }
+                
+                do {
+                    let decodedData = try JSONDecoder().decode(responseType, from: data)
+                    callback(true, decodedData)
+                } catch {
+                    print("Not able to decode the json")
+                    callback(false, nil)
+                }
             }
         }
         task?.resume()
+    }
+    
+    private func createBody(_ params: [String: String]) -> String {
+        var i = 1
+        var body = ""
+        params.forEach { key, value in
+            if i == params.count {
+                body += "\(key)=\(value)"
+            } else {
+                body += "\(key)=\(value)&"
+            }
+            i += 1
+        }
+        return body
     }
 }
 
@@ -67,5 +99,9 @@ struct AccountInfo: Decodable {
         let value: Double
         let label: String
     }
+}
+
+struct Transfer: Decodable {
+    
 }
 

@@ -1,0 +1,205 @@
+{
+    "currentBalance": 5459.32,
+    "transactions": [
+        {
+            "label": "IKEA",
+            "value": -56.4
+        },
+        {
+            "value": -10,
+            "label": "Starbucks"
+        },
+        {
+            "value": 1400,
+            "label": "Pole Emploi"
+        },
+        {
+            "value": -5.8,
+            "label": "Amazon"
+        },
+        {
+            "value": -80.25,
+            "label": "Grocery Store"
+        },
+        {
+            "value": -120,
+            "label": "Utility Bill"
+        },
+        {
+            "value": -50,
+            "label": "Phone Bill"
+        },
+        {
+            "label": "Monthly Rent",
+            "value": -900
+        },
+        {
+            "value": -40,
+            "label": "Gym Membership"
+        },
+        {
+            "label": "Netflix",
+            "value": -9.99
+        },
+        {
+            "value": -15.75,
+            "label": "Pizza Place"
+        },
+        {
+            "value": -30,
+            "label": "Train Ticket"
+        },
+        {
+            "value": -45,
+            "label": "Gas Station"
+        },
+        {
+            "label": "Dentist",
+            "value": -75
+        },
+        {
+            "value": -299,
+            "label": "Apple Store"
+        },
+        {
+            "label": "Restaurant",
+            "value": -60
+        },
+        {
+            "value": -100,
+            "label": "Insurance"
+        },
+        {
+            "value": -150,
+            "label": "Online Course"
+        },
+        {
+            "label": "Book Store",
+            "value": -20
+        },
+        {
+            "value": -25,
+            "label": "Hair Salon"
+        },
+        {
+            "label": "Electronics Store",
+            "value": -200
+        },
+        {
+            "value": -50,
+            "label": "Pet Supplies"
+        },
+        {
+            "label": "Cinema",
+            "value": -20
+        },
+        {
+            "value": 350,
+            "label": "Freelance"
+        },
+        {
+            "value": 100,
+            "label": "Gift"
+        },
+        {
+            "value": -6,
+            "label": "Coffee Shop"
+        },
+        {
+            "label": "Taxi",
+            "value": -40
+        },
+        {
+            "label": "Hotel Booking",
+            "value": -150
+        },
+        {
+            "value": -9.99,
+            "label": "Spotify"
+        },
+        {
+            "value": -90,
+            "label": "Shoe Store"
+        },
+        {
+            "value": -25,
+            "label": "Pharmacy"
+        },
+        {
+            "value": -20,
+            "label": "Public Transport"
+        },
+        {
+            "value": -200,
+            "label": "Cash Withdrawal"
+        },
+        {
+            "label": "Game Purchase",
+            "value": -50
+        },
+        {
+            "value": -8,
+            "label": "Bakery"
+        },
+        {
+            "label": "Cafe",
+            "value": -12
+        },
+        {
+            "label": "Toy Store",
+            "value": -30
+        },
+        {
+            "label": "Hardware Store",
+            "value": -45
+        },
+        {
+            "value": -15,
+            "label": "Dry Cleaning"
+        },
+        {
+            "value": -20,
+            "label": "Donation"
+        },
+        {
+            "value": -80,
+            "label": "Concert Ticket"
+        },
+        {
+            "value": 25,
+            "label": "Retailer Refund"
+        },
+        {
+            "value": -15,
+            "label": "Late Fee"
+        },
+        {
+            "label": "Interest Earned",
+            "value": 4.5
+        },
+        {
+            "label": "Work Bonus",
+            "value": 250
+        },
+        {
+            "value": -25,
+            "label": "Wine Store"
+        },
+        {
+            "label": "Veterinary",
+            "value": -120
+        },
+        {
+            "label": "Parking Ticket",
+            "value": -60
+        },
+        {
+            "label": "Florist",
+            "value": -40
+        },
+        {
+            "value": -20,
+            "label": "Tailor"
+        }
+    ]
+}

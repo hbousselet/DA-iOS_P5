@@ -20,12 +20,12 @@ class AuthenticationViewModel: ObservableObject {
     }
     
     func login() {
-        ApiService.shared.httpCall(httpMethod: "POST", route: .auth, parameters: (username, password)) { isWithoutError, data in
-            guard let data, isWithoutError == true else { return }
-            guard let responseJson = try? JSONDecoder().decode(Authentication.self, from: data) else {
-                print("not able to convert")
-                return }
-            self.token = responseJson.token
+        let parameters = ["username": username, "password": password]
+        ApiService.shared.request(httpMethod: "POST", route: .auth, responseType: Authentication.self, parameters: parameters) { isWithoutError, decodedData in
+            guard let decodedData, isWithoutError == true else { return }
+            print(decodedData)
+            self.token = decodedData.token
+            ApiService.token = decodedData.token
             self.onLoginSucceed()
             print("login with \(self.username) and \(self.password)")
         }
