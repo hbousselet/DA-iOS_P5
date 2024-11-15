@@ -23,9 +23,4 @@ class AppViewModel: ObservableObject {
     var accountDetailViewModel: AccountDetailViewModel {
         return AccountDetailViewModel()
     }
-    
-//    var allTransactionsViewModel: TransactionsViewModel {
-//        return TransactionsViewModel()
-//    }
-    
 }

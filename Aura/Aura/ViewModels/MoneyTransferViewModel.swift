@@ -10,7 +10,7 @@ import Foundation
 class MoneyTransferViewModel: ObservableObject {
     @Published var recipient: String = ""
     @Published var amount: String = ""
-    @Published var transferMessage: String = ""
+    @Published var transfertMessage: String = ""
     
     func sendMoney() {
         let parameters = ["recipient": recipient, "amount": amount]
@@ -19,12 +19,25 @@ class MoneyTransferViewModel: ObservableObject {
         if !recipient.isEmpty && !amount.isEmpty {
             ApiService.shared.request(httpMethod: "POST", route: .transfer, responseType: Transfer.self, parameters: parameters) { isWithoutError, decodedData in
                 guard isWithoutError == true else {
-                    self.transferMessage = "Not found."
+                    self.transfertMessage = "Not found."
                     return }
-                self.transferMessage = "Successfully transferred \(self.amount) to \(self.recipient)"
+                self.transfertMessage = "Successfully transferred \(self.amount) to \(self.recipient)"
             }
         } else {
-            transferMessage = "Please enter recipient and amount."
+            transfertMessage = "Please enter recipient and amount."
+        }
+    }
+    
+    @MainActor
+    func sendMoneyAsync() async throws{
+        let parameters = ["recipient": recipient, "amount": amount]
+        if !recipient.isEmpty && !amount.isEmpty {
+            guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .transfer, responseType: Transfer.self) else {
+                self.transfertMessage = "Not found."
+                return }
+            if code == 200 {
+                self.transfertMessage = "Successfully transferred \(self.amount) to \(self.recipient)"
+            }
         }
     }
 }

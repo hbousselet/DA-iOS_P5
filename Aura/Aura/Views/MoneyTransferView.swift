@@ -39,6 +39,8 @@ struct MoneyTransferView: View {
                         .font(.headline)
                     TextField("Enter recipient's info", text: $viewModel.recipient)
                         .padding()
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
                         .keyboardType(.emailAddress)
@@ -55,10 +57,12 @@ struct MoneyTransferView: View {
                 }
 
                 Button(action: {
-                    if isRecipientWellFormattedForPhoneNumber(viewModel.recipient) && isValidAmount(viewModel.amount) {
-                        viewModel.sendMoney()
-                    } else {
-                        showingAlert = true
+                    Task {
+                        if (isRecipientWellFormattedForPhoneNumber(viewModel.recipient) || isRecipientWellFormattedForEmail(viewModel.recipient)) && isValidAmount(viewModel.amount) {
+                            try? await viewModel.sendMoneyAsync()
+                        } else {
+                            showingAlert = true
+                        }
                     }
                 }
                 ) {
@@ -80,8 +84,8 @@ struct MoneyTransferView: View {
                         }
 
                 // Message
-                if !viewModel.transferMessage.isEmpty {
-                    Text(viewModel.transferMessage)
+                if !viewModel.transfertMessage.isEmpty {
+                    Text(viewModel.transfertMessage)
                         .padding(.top, 20)
                         .transition(.move(edge: .top))
                 }
@@ -104,7 +108,7 @@ struct MoneyTransferView: View {
         }
     }
 
-    func isRecipientWellFormattedForPhoneNumber(_ recipient: String) -> Bool {
+    func blabla(_ recipient: String) -> Bool {
         var isPhoneNumberValid = false
         let phoneRegex = try? NSRegularExpression(pattern: "^(\\+33[1-9]|0[1-9])[1-9]\\d{8}$", options: .caseInsensitive)
         if let regex = phoneRegex {
@@ -120,7 +124,14 @@ struct MoneyTransferView: View {
     private func isRecipientWellFormattedForEmail(_ recipient: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        print("email enered: \(recipient) and isValid: \(emailPred.evaluate(with: recipient))")
         return emailPred.evaluate(with: recipient)
+    }
+    func isRecipientWellFormattedForPhoneNumber(_ phoneNumber: String) -> Bool {
+        let phoneNumberRegex = "^(\\+33[1-9]|0[1-9])[0-9]{8}$"
+        let phoneNumberPredicate = NSPredicate(format: "SELF MATCHES %@", phoneNumberRegex)
+        print("phone: \(phoneNumber) with regex: \(phoneNumberPredicate.evaluate(with: phoneNumber))")
+        return phoneNumberPredicate.evaluate(with: phoneNumber)
     }
 }
 

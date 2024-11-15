@@ -46,6 +46,10 @@ class FakeResponseData {
     }
     
     static let accountIncorrectData = "erreur".data(using: .utf8)!
+    
+    static let transfertOk = "".data(using: .utf8)
+    
+    static let transfertNOK = "erreur".data(using: .utf8)!
 
     
     //    static var quoteCorrectData: Data {

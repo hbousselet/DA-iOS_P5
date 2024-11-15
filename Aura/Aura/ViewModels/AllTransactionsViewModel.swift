@@ -9,10 +9,16 @@ import Foundation
 
 
 class TransactionsViewModel: ObservableObject {
+    var allTransactions: [AccountInfo.Transaction]
     
-    @Published var allTransactions: [Transaction] = createTransactionObject(transactions: ApiService.allAccountTransactions)
+    @Published var model: [Transaction]?
     
-    private static func createTransactionObject(transactions: [AccountInfo.Transaction]) -> [Transaction] {
+    init(allTransactions: [AccountInfo.Transaction]) {
+        self.allTransactions = allTransactions
+        self.model = createTransactionObject(transactions: allTransactions)
+    }
+        
+    private func createTransactionObject(transactions: [AccountInfo.Transaction]) -> [Transaction] {
         var businessTransaction = [Transaction]()
         var transactionId: Int = 1
         for transaction in transactions {

@@ -30,4 +30,18 @@ class AuthenticationViewModel: ObservableObject {
             print("login with \(self.username) and \(self.password)")
         }
     }
+    @MainActor
+    func loginAsync() async throws {
+        let parameters = ["password": password, "username": username]
+        print(parameters)
+        guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .auth, responseType: Authentication.self) else {
+            print("unvalid")
+            return
+        }
+        guard let request = request else { return }
+        self.token = request.token
+        APIServiceAsync.token = request.token
+        self.onLoginSucceed()
+        print("login with \(self.username) and \(self.password)")
+    }
 }

@@ -40,9 +40,9 @@ struct AuthenticationView: View {
                             .padding()
                             .background(Color(UIColor.secondarySystemBackground))
                             .cornerRadius(8)
-                            .autocapitalization(.none)
+                            .autocorrectionDisabled(true)
+                            .textInputAutocapitalization(.never)
                             .keyboardType(.emailAddress)
-                            .disableAutocorrection(true)
                         
                         SecureField("Mot de passe", text: $viewModel.password)
                             .padding()
@@ -51,12 +51,15 @@ struct AuthenticationView: View {
                         
                         Button(action: {
                             // Handle authentication logic here
-                            if isValidEmail(viewModel.username) && !viewModel.password.isEmpty {
-                                showingAlert = false
-                                viewModel.login()
-                            } else {
-                                showingAlert = true
+                            Task {
+                                if isValidEmail(viewModel.username) && !viewModel.password.isEmpty {
+                                    showingAlert = false
+                                    try? await viewModel.loginAsync()
+                                } else {
+                                    showingAlert = true
+                                }
                             }
+                            showingAlert = false
                         }) {
                             Text("Se connecter")
                                 .foregroundColor(.white)
@@ -79,10 +82,10 @@ struct AuthenticationView: View {
                 }
     }
     
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
+    }
 }
 
-private func isValidEmail(_ email: String) -> Bool {
-    let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-    let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-    return emailPred.evaluate(with: email)
-}

@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct AllTransactionsView: View {
+    var allTransactions: [AccountInfo.Transaction]
     @ObservedObject var viewModel: TransactionsViewModel
+
+    
+    init(allTransactions: [AccountInfo.Transaction]) {
+        self.allTransactions = allTransactions
+        self.viewModel = TransactionsViewModel(allTransactions: allTransactions)
+    }
     var body: some View {
-        if !viewModel.allTransactions.isEmpty {
+        if let model = viewModel.model {
             Form {
-                ForEach(viewModel.allTransactions) { currentTransaction in
+                ForEach(model) { currentTransaction in
                     HStack{
                         Text("\(currentTransaction.id.description): \(currentTransaction.description)")
                         Spacer()

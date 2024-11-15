@@ -72,10 +72,12 @@ struct AccountDetailView: View {
                 self.endEditing(true)  // This will dismiss the keyboard when tapping outside
             }
             .onAppear {
-                viewModel.callForLastTransactions()
+                Task {
+                    try? await viewModel.callForTransactionsAsync()
+                }
             }
             NavigationLink(
-                destination: AllTransactionsView(viewModel: TransactionsViewModel()),
+                destination: AllTransactionsView(allTransactions: viewModel.allTransactionsFromAccount),
                             isActive: $showAllTransactionView
                         ) {
                             EmptyView()
