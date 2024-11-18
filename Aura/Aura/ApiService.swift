@@ -98,6 +98,13 @@ class APIServiceAsync {
     static var shared = APIServiceAsync()
     static var token: String? = nil
     
+    //create session as a class variable and render it private not public
+    private var auraSession: MockURLSession = URLSession(configuration: .default)
+    
+    init(session:MockURLSession  = URLSession.shared) {
+        self.auraSession = session
+    }
+    
     private init() {}
     
     func request<T: Decodable>(endpoint: Endpoint,
@@ -116,7 +123,7 @@ class APIServiceAsync {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = endpoint.method
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await auraSession.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw APIErrors.invalidResponse
@@ -132,6 +139,7 @@ class APIServiceAsync {
         return (httpResponse.statusCode, decodedData)
     }
 }
+
 enum APIErrors: Error {
     case invalidResponse
     case invalidDecode
@@ -187,3 +195,36 @@ struct AccountInfo: Decodable {
 
 struct Transfer: Decodable {}
 
+
+protocol MockURLSession {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+}
+
+class MockAsyncURLSession: MockURLSession {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        if let error = error {
+            throw error
+        }
+        
+        guard let data = data, let response = response else {
+            throw URLError(.badServerResponse)
+        }
+        return (data, response)
+    }
+    
+    var data: Data?
+    var response: URLResponse?
+    var error: Error?
+    
+    init(data: Data?, response: URLResponse?, error: Error?) {
+        self.data = data
+        self.response = response
+        self.error = error
+    }
+}
+
+extension URLSession: MockURLSession {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        try await data(for: request, delegate: nil)
+    }
+}
