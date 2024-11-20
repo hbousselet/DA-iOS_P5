@@ -23,7 +23,6 @@ class AuthenticationViewModel: ObservableObject {
         let parameters = ["username": username, "password": password]
         ApiService.shared.request(httpMethod: "POST", route: .auth, responseType: Authentication.self, parameters: parameters) { isWithoutError, decodedData in
             guard let decodedData, isWithoutError == true else { return }
-            print(decodedData)
             self.token = decodedData.token
             ApiService.token = decodedData.token
             self.onLoginSucceed()
@@ -33,7 +32,6 @@ class AuthenticationViewModel: ObservableObject {
     @MainActor
     func loginAsync() async throws {
         let parameters = ["password": password, "username": username]
-        print(parameters)
         guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .auth, responseType: Authentication.self) else {
             print("unvalid")
             return

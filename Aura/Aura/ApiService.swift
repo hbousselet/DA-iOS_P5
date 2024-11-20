@@ -119,7 +119,6 @@ class APIServiceAsync {
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.httpMethod
         request.setValue(APIServiceAsync.token, forHTTPHeaderField: "token")
-        // à voir si on garde dans toutes les situations ?
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = endpoint.method
         

@@ -7,7 +7,7 @@
 
 import Foundation
 
-
+//For non Async calls we fake URLSession.dataTask and URLSession
 class URLSessionFake: URLSession {
     var data: Data?
     var response: URLResponse?

@@ -99,26 +99,16 @@ struct MoneyTransferView: View {
         }
     
     private func isValidAmount(_ amount: String) -> Bool {
+        let pattern = "^\\d+(\\.\\d+)?$"
+        guard amount.range(of: pattern, options: .regularExpression) != nil else {
+            return false
+        }
         guard let n = Decimal(string: amount) else { return false }
-        print(n)
-        if n.significantFractionalDecimalDigits >= -2 && n > 0 {
+        if n.significantFractionalDecimalDigits <= 2 && n > 0 {
             return true
         } else {
             return false
         }
-    }
-
-    func blabla(_ recipient: String) -> Bool {
-        var isPhoneNumberValid = false
-        let phoneRegex = try? NSRegularExpression(pattern: "^(\\+33[1-9]|0[1-9])[1-9]\\d{8}$", options: .caseInsensitive)
-        if let regex = phoneRegex {
-            let range = NSRange(location: 0, length: recipient.utf16.count)
-            let matches = regex.matches(in: recipient, range: range)
-            isPhoneNumberValid = matches.count > 0
-        } else {
-            isPhoneNumberValid = false
-        }
-        return isPhoneNumberValid
     }
     
     private func isRecipientWellFormattedForEmail(_ recipient: String) -> Bool {

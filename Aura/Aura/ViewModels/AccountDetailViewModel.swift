@@ -49,7 +49,6 @@ class AccountDetailViewModel: ObservableObject {
             self.allTransactions.append(Transaction(description: transact.label, amount: transact.value.currencyString()))
         }
         self.recentTransactions = Array(self.allTransactions.prefix(3))
-        ApiService.allAccountTransactions = request.transactions
     }
     
     struct Transaction {

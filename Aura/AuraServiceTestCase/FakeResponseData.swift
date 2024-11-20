@@ -50,15 +50,4 @@ class FakeResponseData {
     static let transfertOk = "".data(using: .utf8)
     
     static let transfertNOK = "erreur".data(using: .utf8)!
-
-    
-    //    static var quoteCorrectData: Data {
-//        let bundle = Bundle(for: FakeResponseData.self)
-//        let url = bundle.url(forResource: "Quote", withExtension: "json")!
-//        
-//        return try! Data(contentsOf: url)
-//    }
-    
-    
-    
 }

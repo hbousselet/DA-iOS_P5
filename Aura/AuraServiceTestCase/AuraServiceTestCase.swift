@@ -217,6 +217,7 @@ class AuraServiceAsyncTestCase: XCTestCase {
             XCTAssertEqual(receivedData?.1?.token, "D8606CD3-5708-463E-973D-AC3617DC87F5")
             XCTAssertEqual(receivedData?.0, 200)
         } catch {
+            XCTAssertNil(error)
         }
     }
     
@@ -246,7 +247,7 @@ class AuraServiceAsyncTestCase: XCTestCase {
             let response = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
             XCTAssertNil(response)
         } catch {
-            XCTAssertNotNil(error)
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
         }
     }
     
@@ -259,9 +260,10 @@ class AuraServiceAsyncTestCase: XCTestCase {
         
         //When
         do {
-            let _ = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
+            let response = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
+            XCTAssertNil(response)
         } catch {
-            XCTAssertNotNil(error)
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
         }
     }
     
@@ -276,7 +278,7 @@ class AuraServiceAsyncTestCase: XCTestCase {
             XCTAssertEqual(receivedData?.1?.currentBalance, 5459.32)
             XCTAssertEqual(receivedData?.0, 200)
         } catch {
-            XCTAssertNotNil(error)
+            XCTAssertNil(error)
         }
     }
     
@@ -293,98 +295,86 @@ class AuraServiceAsyncTestCase: XCTestCase {
         }
     }
     
-    func testAccountNOKDueToResponseNOK() {
+    func testAccountNOKDueToResponseNOKAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.accountTransactionOK, response: Fake.responseNOK, error: nil))
+        let session = MockAsyncURLSession(data: Fake.accountTransactionOK, response: Fake.responseNOK, error: nil)
+        let service = APIServiceAsync(session: session)
         
         //When
-        auraApiService.request(httpMethod: "GET", route: .account, responseType: AccountInfo.self) { (success, token) in
-            //Then
-            XCTAssertFalse(success)
-            XCTAssertNil(token)
-            expectation.fulfill()
+        do {
+            let response = try await service.request(endpoint: .get, route: .account, responseType: AccountInfo.self)
+            XCTAssertNil(response)
+        } catch {
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
     
-    func testAccountNOKDueToWrongData() {
+    func testAccountNOKDueToWrongDataAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.accountIncorrectData, response: Fake.responseOK, error: nil))
+        let session = MockAsyncURLSession(data: Fake.accountIncorrectData, response: Fake.responseOK, error: nil)
+        let service = APIServiceAsync(session: session)
         
         //When
-        auraApiService.request(httpMethod: "GET", route: .account, responseType: AccountInfo.self) { (success, token) in
-            //Then
-            XCTAssertFalse(success)
-            XCTAssertNil(token)
-            expectation.fulfill()
+        do {
+            let response = try await service.request(endpoint: .get, route: .account, responseType: AccountInfo.self)
+            XCTAssertNil(response)
+        } catch {
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
     
     //Transfert
-    func testTransfertOK() {
+    func testTransfertOKAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.transfertOk, response: Fake.responseOK, error: nil))
+        let session = MockAsyncURLSession(data: Fake.transfertOk, response: Fake.responseOK, error: nil)
+        let service = APIServiceAsync(session: session)
         
         //When
-        auraApiService.request(httpMethod: "GET", route: .transfer, responseType: Transfer.self) { (success, value) in
-            //Then
-            XCTAssertTrue(success)
-            XCTAssertNil(value)
-            expectation.fulfill()
+        do {
+            let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
+            XCTAssertNil(response?.1)
+            XCTAssertEqual(response?.0, 200)
+        } catch {
+            XCTAssertNil(error)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
     
-    func testTransfertNOKDueToError() {
+    func testTransfertNOKDueToErrorAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.transfertNOK, response: Fake.responseNOK, error: Fake.error))
-        
-        //When
-        auraApiService.request(httpMethod: "POST", route: .transfer, responseType: Transfer.self) { (success, value) in
-            //Then
-            XCTAssertFalse(success)
-            XCTAssertNil(value)
-            expectation.fulfill()
+        let session = MockAsyncURLSession(data: Fake.transfertNOK, response: Fake.responseNOK, error: Fake.error)
+        let service = APIServiceAsync(session: session)
+                        
+        do {
+            let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
+            XCTAssertNil(response)
+        } catch {
+            XCTAssertNotNil(error)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
     
-    func testTransfertNOKDueToResponseNOK() {
+    func testTransfertNOKDueToResponseNOKAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.transfertNOK, response: Fake.responseNOK, error: nil))
-        
-        //When
-        auraApiService.request(httpMethod: "POST", route: .transfer, responseType: Transfer.self) { (success, value) in
-            //Then
-            XCTAssertFalse(success)
-            XCTAssertNil(value)
-            expectation.fulfill()
+        let session = MockAsyncURLSession(data: Fake.transfertNOK, response: Fake.responseNOK, error: nil)
+        let service = APIServiceAsync(session: session)
+                        
+        do {
+            let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
+            XCTAssertNil(response)
+        } catch {
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
     
-    func testTransfertNOKDueToWrongData() {
+    func testTransfertNOKDueToWrongDataAsync() async {
         //Given
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        let auraApiService = ApiService(session: URLSessionFake(data: Fake.transfertNOK, response: Fake.responseOK, error: nil))
-        
-        //When
-        auraApiService.request(httpMethod: "POST", route: .transfer, responseType: Transfer.self) { (success, value) in
-            //Then
-            XCTAssertFalse(success)
-            XCTAssertNil(value)
-            expectation.fulfill()
+        let session = MockAsyncURLSession(data: Fake.transfertNOK, response: Fake.responseOK, error: nil)
+        let service = APIServiceAsync(session: session)
+                        
+        do {
+            let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
+            XCTAssertNil(response)
+        } catch {
+            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
         }
-        wait(for: [expectation], timeout: 0.01)
     }
-
-    
-    
-    
 }
