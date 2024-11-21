@@ -101,19 +101,19 @@ class APIServiceAsync {
     //create session as a class variable and render it private not public
     private var auraSession: MockURLSession = URLSession(configuration: .default)
     
-    init(session:MockURLSession  = URLSession.shared) {
+    init(session: MockURLSession  = URLSession.shared) {
         self.auraSession = session
     }
     
     private init() {}
-    
+    // modifier (Int, T?)? pour n'utiliser que result https://developer.apple.com/documentation/swift/result
     func request<T: Decodable>(endpoint: Endpoint,
                                route: Route,
-                               responseType: T.Type) async throws -> (Int, T?)? {
+                               responseType: T.Type) async throws -> Result<T?, APIErrors> {
         
         guard let url = URL(string: apiURL + route.rawValue) else {
             print("invalid URL")
-            return nil
+            return .failure(.invalidURL)
         }
         
         var request = URLRequest(url: url)
@@ -125,23 +125,24 @@ class APIServiceAsync {
         let (data, response) = try await auraSession.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
-            throw APIErrors.invalidResponse
+            return .failure(.invalidResponse)
         }
         
         if data.isEmpty {
-            return (httpResponse.statusCode, nil)
+            return .success(nil)
         }
         
         guard let decodedData = try? JSONDecoder().decode(responseType, from: data) else {
-            throw APIErrors.invalidDecode
+            return .failure(APIErrors.invalidDecode)
         }
-        return (httpResponse.statusCode, decodedData)
+        return .success(decodedData)
     }
 }
 
 enum APIErrors: Error {
     case invalidResponse
     case invalidDecode
+    case invalidURL
 }
 
 enum Endpoint {

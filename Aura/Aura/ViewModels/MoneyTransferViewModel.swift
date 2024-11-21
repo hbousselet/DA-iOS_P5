@@ -32,11 +32,15 @@ class MoneyTransferViewModel: ObservableObject {
     func sendMoneyAsync() async throws{
         let parameters = ["recipient": recipient, "amount": amount]
         if !recipient.isEmpty && !amount.isEmpty {
-            guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .transfer, responseType: Transfer.self) else {
+            guard let result = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .transfer, responseType: Transfer.self) else {
                 self.transfertMessage = "Not found."
                 return }
-            if code == 200 {
+            
+            switch result {
+            case .success(_):
                 self.transfertMessage = "Successfully transferred \(self.amount) to \(self.recipient)"
+            case .failure(let error):
+                print("Fail to transfer money: \(error)")
             }
         }
     }

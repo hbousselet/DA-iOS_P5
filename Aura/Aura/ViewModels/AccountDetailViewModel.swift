@@ -9,10 +9,8 @@ import Foundation
 
 class AccountDetailViewModel: ObservableObject {
     @Published var totalAmount: Double = 0.0
-    //creation
     @Published var allTransactions: [Transaction] = []
     @Published var allTransactionsFromAccount: [AccountInfo.Transaction] = []
-    
     @Published var recentTransactions: [Transaction] = []
     
     func callForLastTransactions() {
@@ -35,20 +33,27 @@ class AccountDetailViewModel: ObservableObject {
     func callForTransactionsAsync() async throws {
         allTransactions = []
         recentTransactions = []
-        guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: Endpoint.get,
+        guard let result = try? await APIServiceAsync.shared.request(endpoint: Endpoint.get,
                                                                       route: .account,
                                                                       responseType: AccountInfo.self)
         else {
             return
         }
-        guard let request = request else { return }
-        self.totalAmount = request.currentBalance
-        self.allTransactionsFromAccount = request.transactions
-        //turn AccountInfo.Transaction into AccountDetailViewModel
-        for transact in request.transactions {
-            self.allTransactions.append(Transaction(description: transact.label, amount: transact.value.currencyString()))
+        
+        switch result {
+        case .success(let accountDetails):
+            if let accountDetails {
+                self.totalAmount = accountDetails.currentBalance
+                self.allTransactionsFromAccount = accountDetails.transactions
+                //turn AccountInfo.Transaction into AccountDetailViewModel
+                for transact in accountDetails.transactions {
+                    self.allTransactions.append(Transaction(description: transact.label, amount: transact.value.currencyString()))
+                }
+                self.recentTransactions = Array(self.allTransactions.prefix(3))
+            }
+        case .failure(let error):
+            print("Failure to get the account details: \(error)")
         }
-        self.recentTransactions = Array(self.allTransactions.prefix(3))
     }
     
     struct Transaction {

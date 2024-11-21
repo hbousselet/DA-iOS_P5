@@ -32,14 +32,19 @@ class AuthenticationViewModel: ObservableObject {
     @MainActor
     func loginAsync() async throws {
         let parameters = ["password": password, "username": username]
-        guard let (code, request) = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .auth, responseType: Authentication.self) else {
-            print("unvalid")
+        guard let result = try? await APIServiceAsync.shared.request(endpoint: .post(parameters), route: .auth, responseType: Authentication.self) else {
             return
         }
-        guard let request = request else { return }
-        self.token = request.token
-        APIServiceAsync.token = request.token
-        self.onLoginSucceed()
-        print("login with \(self.username) and \(self.password)")
+        switch result {
+        case .success(let authResult):
+            if let authResult {
+                self.token = authResult.token
+                APIServiceAsync.token = authResult.token
+                self.onLoginSucceed()
+                print("login with \(self.username) and \(self.password)")
+            }
+        case .failure(let error):
+            print("Failure to log in: \(error)")
+        }
     }
 }
