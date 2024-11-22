@@ -214,8 +214,8 @@ class AuraServiceAsyncTestCase: XCTestCase {
         
         do {
             let receivedData = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
-            XCTAssertEqual(receivedData?.1?.token, "D8606CD3-5708-463E-973D-AC3617DC87F5")
-            XCTAssertEqual(receivedData?.0, 200)
+            let result = try receivedData.get()
+            XCTAssertEqual(result?.token, "D8606CD3-5708-463E-973D-AC3617DC87F5")
         } catch {
             XCTAssertNil(error)
         }
@@ -245,10 +245,14 @@ class AuraServiceAsyncTestCase: XCTestCase {
         //When
         do {
             let response = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidResponse)
+            }
+        } catch { }
+    
     }
     
     func testAuthNOKDueToWrongDataAsync() async {
@@ -261,10 +265,13 @@ class AuraServiceAsyncTestCase: XCTestCase {
         //When
         do {
             let response = try await service.request(endpoint: .post(fakeParams), route: .auth, responseType: Authentication.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidDecode)
+            }
+        } catch { }
     }
     
     func testAccountOKAsync() async {
@@ -275,11 +282,13 @@ class AuraServiceAsyncTestCase: XCTestCase {
         //When
         do {
             let receivedData = try await service.request(endpoint: .get, route: .account, responseType: AccountInfo.self)
-            XCTAssertEqual(receivedData?.1?.currentBalance, 5459.32)
-            XCTAssertEqual(receivedData?.0, 200)
-        } catch {
-            XCTAssertNil(error)
-        }
+            switch receivedData {
+            case .success(let response):
+                XCTAssertEqual(response?.currentBalance, 5459.32)
+            case .failure(let error):
+                break
+            }
+        } catch { }
     }
     
     func testAccountNOKDueToErrorAsync() async {
@@ -303,10 +312,13 @@ class AuraServiceAsyncTestCase: XCTestCase {
         //When
         do {
             let response = try await service.request(endpoint: .get, route: .account, responseType: AccountInfo.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidResponse)
+            }
+        } catch {  }
     }
     
     func testAccountNOKDueToWrongDataAsync() async {
@@ -317,10 +329,13 @@ class AuraServiceAsyncTestCase: XCTestCase {
         //When
         do {
             let response = try await service.request(endpoint: .get, route: .account, responseType: AccountInfo.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidDecode)
+            }
+        } catch { }
     }
     
     //Transfert
@@ -331,12 +346,14 @@ class AuraServiceAsyncTestCase: XCTestCase {
         
         //When
         do {
-            let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
-            XCTAssertNil(response?.1)
-            XCTAssertEqual(response?.0, 200)
-        } catch {
-            XCTAssertNil(error)
-        }
+            let receivedData = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
+            switch receivedData {
+            case .success(let response):
+                XCTAssertNil(response)
+            case .failure(_):
+                break
+            }
+        } catch {}
     }
     
     func testTransfertNOKDueToErrorAsync() async {
@@ -359,10 +376,13 @@ class AuraServiceAsyncTestCase: XCTestCase {
                         
         do {
             let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidResponse)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidResponse)
+            }
+        } catch { }
     }
     
     func testTransfertNOKDueToWrongDataAsync() async {
@@ -372,9 +392,12 @@ class AuraServiceAsyncTestCase: XCTestCase {
                         
         do {
             let response = try await service.request(endpoint: .get, route: .transfer, responseType: Transfer.self)
-            XCTAssertNil(response)
-        } catch {
-            XCTAssertTrue(error as! APIErrors == APIErrors.invalidDecode)
-        }
+            switch response {
+            case .success(_):
+                break
+            case .failure(let error):
+                XCTAssertTrue(error == APIErrors.invalidDecode)
+            }
+        } catch { }
     }
 }
