@@ -42,12 +42,6 @@ class ApiService {
         request.httpMethod = httpMethod
         request.setValue(token, forHTTPHeaderField: "token")
         
-        // à fixer les params + concurrency + remove token + swift 6
-        //https://developer.apple.com/videos/play/wwdc2024/10169
-//        request.httpBody = switch endpoint.method {
-//        case .get: nil
-//        case .post: try? JSONSerialization.data(withJSONObject: endpoint.parameters, options: [])
-//        }
         if let parameters = parameters {
             let body = createBody(parameters)
             request.httpBody = body.data(using: .utf8)
